@@ -7,7 +7,7 @@ The application is currently built with C++ using OpenCV 2.4.10 through any OS o
 ## Current Usage
 With successful compilation of the application, one can add an "object.jpg" file and a "scene.jpg" so that the object can be picked out from the scene through homography. Note that the files must be placed in the same directory as the executable for the time being.
 
-The eventuality is that we can nest the existing code into an infinite loop, reading frame by frame from the open video port on the AR.Drone, mapping features over time. Every so often, we can send flight commands to the follower drone based on the recognized features from the leader drone by jugding the distance from the absolute center of the following drone's vision. Basically, the follower drone should always attempt to center its vision on the leader drone.
+The eventuality is that we can nest the existing code into an infinite loop, reading frame by frame from the open video port on the AR.Drone, mapping features over time. Every so often, we can send flight commands to the follower drone based on the recognized features from the leader drone by judging the distance from the absolute center of the following drone's vision. Basically, the follower drone should always attempt to center its vision on the leader drone.
 
 This doesn't account for depth, but this can be adjusted for by calculating the size of combined recognized features, always attempting to scale to the known features appropriately.
 
