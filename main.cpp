@@ -96,6 +96,6 @@ int main(int argc, char** argv) {
         //-- Show detected matches
         imshow("Good Matches & Object detection", img_matches);
 
-        waitKey(10); }
+        waitKey(100); }
     
     return 0; }
