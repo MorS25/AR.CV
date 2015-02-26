@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     while (true) {
         cap >> img_scene_rgb;
         
-        // Covert video stream to grayscale.
+        // Convert video stream to grayscale.
         img_scene = img_scene_rgb.clone();
         cvtColor(img_scene_rgb, img_scene, CV_RGB2GRAY);
         
