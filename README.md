@@ -26,3 +26,7 @@ Here's a [tutorial](http://www.anlak.com/2012/10/using-opencv-2-4-x-with-visual-
 The guide works with Windows 8.1.
 
 This guide is also confirmed to work with Visual Studio 2013. Just use the "VS12" linkage built into OpenCV -- it works with Visual Studio 2013. Be sure to use the OpenCV 2.4.10 library files as per the system requirements.
+
+### Linux
+
+Follow [this](http://docs.opencv.org/2.4.10/doc/tutorials/introduction/linux_install/linux_install.html) tutorial to install. Tested and works on Debian Wheezy.
