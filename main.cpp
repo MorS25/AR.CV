@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
             std::cout<< " --(!) Error reading images " << std::endl; return -1; }
 
         //-- Step 1: Detect the keypoints using SURF Detector
-        int minHessian = 400;
+        int minHessian = 500;
 
         SurfFeatureDetector detector(minHessian);
 
@@ -102,6 +102,6 @@ int main(int argc, char** argv) {
         //-- Show detected matches
         imshow("Good Matches & Object detection", img_matches);
 
-        waitKey(100); }
+        waitKey(200); }
     
     return 0; }
