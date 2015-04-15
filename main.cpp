@@ -122,8 +122,6 @@ int main(int argc, char** argv) {
         // Create scalar to adjust center mark to cross hair.
         float scale = 1 / ((obj_corners[1].x - obj_corners[0].x) / (scene_corners[1].x - scene_corners[0].x));
         
-        std::cout << scale;
-        
         //-- Mark center of recognized image only if it's actually detected:
         if (scene_corners[1].x - scene_corners[0].x > 10) {
             // Mark center:
