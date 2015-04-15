@@ -27,13 +27,11 @@ void matchDescriptors(Mat& objectDesc, Mat& sceneDesc, vector<DMatch>& matches) 
     
     matcher.match(objectDesc, sceneDesc, matches); }
 
-void calcMinDistance(double& minDist, double maxDist, Mat& objectDesc, vector<DMatch> matches) {
+void calcMinDistance(double& minDist, Mat& objectDesc, vector<DMatch> matches) {
     for (int i = 0; i < objectDesc.rows; ++i) {
         double dist = matches[i].distance;
         
-        if (dist < minDist) minDist = dist;
-        
-        if (dist > maxDist) maxDist = dist; } }
+        if (dist < minDist) minDist = dist; } }
 
 /** @function main */
 int main(int argc, char** argv) {
@@ -45,7 +43,7 @@ int main(int argc, char** argv) {
     int sceneWidth  = img_scene_rgb.cols;
     
     while (true) {
-        // Capture and convert video stream to gray scale:
+        // Capture and convert video stream to grayscale:
         cap >> img_scene_rgb;
         
         img_scene = img_scene_rgb.clone();
@@ -74,7 +72,7 @@ int main(int argc, char** argv) {
         // Calculate minimum and maximum distances between keypoints:
         double min_dist = 100;
         
-        calcMinDistance(min_dist, 0, descriptors_object, matches);
+        calcMinDistance(min_dist, descriptors_object, matches);
 
         //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
         vector<DMatch> good_matches;
