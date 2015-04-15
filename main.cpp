@@ -7,8 +7,8 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
 void detectKeypoints(Mat& objectImage, Mat& sceneImage, int minHessian, vector<KeyPoint>& objectKeyPoints, vector<KeyPoint>& sceneKeyPoints) {
     SurfFeatureDetector detector(minHessian);
@@ -74,19 +74,19 @@ int main(int argc, char** argv) {
         
         calcMinDistance(min_dist, descriptors_object, matches);
 
-        //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+        // Draw only good matches (whose distance is less than 3 * min_dist):
         vector<DMatch> good_matches;
+        Mat img_matches;
 
         for (int i = 0; i < descriptors_object.rows; ++i) {
             if (matches[i].distance < 3*min_dist) {
                 good_matches.push_back(matches[i]); } }
-
-        Mat img_matches;
+        
         drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
                     good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
                     vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
-        //-- Localize the object
+        // Localize object:
         vector<Point2f> obj;
         vector<Point2f> scene;
 
@@ -97,17 +97,13 @@ int main(int argc, char** argv) {
 
         Mat H = findHomography(obj, scene, CV_RANSAC);
 
-        //-- Get the corners from the image_1 ( the object to be "detected" )
+        // Get the corners from the image_1 (the object to be "detected"):
         
-        /*  
-         
-            All following corners are indexed like so:
+        /*  NOTE: All following corners are indexed like so:
    
             [0]-----[1]
              |       |
-            [3]-----[2]
-         
-        */
+            [3]-----[2]  */
         
         vector<Point2f> obj_corners(4);
         
@@ -118,21 +114,22 @@ int main(int argc, char** argv) {
         
         vector<Point2f> scene_corners(4);
 
+        // Transform corners based on perspective:
         perspectiveTransform(obj_corners, scene_corners, H);
 
-        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+        // Draw lines between the corners (the mapped object in the scene - image_2):
         line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         line(img_matches, scene_corners[1] + Point2f(img_object.cols, 0), scene_corners[2] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         
-        //-- Draw crosshair in center of drone's view.
+        // Draw crosshair in center of drone's view:
         circle(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), 10, Scalar(0, 255, 0));
         
-        // Create scalar to adjust center mark to cross hair.
+        // Create scalar to adjust center mark to cross hair:
         float scale = 1 / ((obj_corners[1].x - obj_corners[0].x) / (scene_corners[1].x - scene_corners[0].x));
         
-        //-- Mark center of recognized image only if it's actually detected:
+        // Mark center of recognized image only if it's actually detected:
         if (scene_corners[1].x - scene_corners[0].x > 10) {
             // Mark center:
             circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), scale * 10, Scalar(0, 255, 0));
@@ -140,7 +137,7 @@ int main(int argc, char** argv) {
             // Draw line from center mark to crosshair:
             line(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), Scalar(0, 255, 0));}
 
-        //-- Show detected matches
+        // Show detected matches
         imshow("Good Matches & Object detection", img_matches);
 
         waitKey(200); }
