@@ -8,11 +8,18 @@
 #include "opencv2/nonfree/nonfree.hpp"
 
 using namespace cv;
+using namespace std;
+
+void detectKeypoints(Mat& objectImage, Mat& sceneImage, int minHessian, vector<KeyPoint>& objectKeyPoints, vector<KeyPoint>& sceneKeyPoints) {
+    SurfFeatureDetector detector(minHessian);
+    
+    detector.detect(objectImage, objectKeyPoints);
+    detector.detect(sceneImage, sceneKeyPoints);
+}
 
 /** @function main */
 int main(int argc, char** argv) {
     Mat img_object = imread("object.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-    
     Mat img_scene_rgb;
     Mat img_scene;
     VideoCapture cap(0);
@@ -28,17 +35,12 @@ int main(int argc, char** argv) {
         cvtColor(img_scene_rgb, img_scene, CV_RGB2GRAY);
         
         if (!img_object.data || !img_scene.data) {
-            std::cout<< " --(!) Error reading images " << std::endl; return -1; }
+            cout << " --(!) Error reading images " << endl;
+            return -1; }
 
-        //-- Step 1: Detect the keypoints using SURF Detector
-        int minHessian = 500;
-
-        SurfFeatureDetector detector(minHessian);
-
-        std::vector<KeyPoint> keypoints_object, keypoints_scene;
-
-        detector.detect(img_object, keypoints_object);
-        detector.detect(img_scene, keypoints_scene);
+        vector<KeyPoint> keypoints_object, keypoints_scene;
+        
+        detectKeypoints(img_object, img_scene, 250, keypoints_object, keypoints_scene);
 
         //-- Step 2: Calculate descriptors (feature vectors)
         SurfDescriptorExtractor extractor;
@@ -50,10 +52,11 @@ int main(int argc, char** argv) {
 
         //-- Step 3: Matching descriptor vectors using FLANN matcher
         FlannBasedMatcher matcher;
-        std::vector< DMatch > matches;
+        vector<DMatch> matches;
         matcher.match(descriptors_object, descriptors_scene, matches);
 
-        double max_dist = 0; double min_dist = 100;
+        double max_dist = 0;
+        double min_dist = 100;
 
         //-- Quick calculation of max and min distances between keypoints
         for (int i = 0; i < descriptors_object.rows; ++i) {
@@ -65,7 +68,7 @@ int main(int argc, char** argv) {
         printf("-- Min dist : %f \n", min_dist);
 
         //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-        std::vector< DMatch > good_matches;
+        vector<DMatch> good_matches;
 
         for (int i = 0; i < descriptors_object.rows; ++i) {
             if (matches[i].distance < 3*min_dist) {
@@ -77,8 +80,8 @@ int main(int argc, char** argv) {
                     vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 
         //-- Localize the object
-        std::vector<Point2f> obj;
-        std::vector<Point2f> scene;
+        vector<Point2f> obj;
+        vector<Point2f> scene;
 
         for (int i = 0; i < good_matches.size(); ++i) {
             //-- Get the keypoints from the good matches
@@ -99,14 +102,14 @@ int main(int argc, char** argv) {
          
         */
         
-        std::vector<Point2f> obj_corners(4);
+        vector<Point2f> obj_corners(4);
         
         obj_corners[0] = cvPoint(0,0);
         obj_corners[1] = cvPoint(img_object.cols, 0);
         obj_corners[2] = cvPoint(img_object.cols, img_object.rows);
         obj_corners[3] = cvPoint(0, img_object.rows);
         
-        std::vector<Point2f> scene_corners(4);
+        vector<Point2f> scene_corners(4);
 
         perspectiveTransform(obj_corners, scene_corners, H);
 
