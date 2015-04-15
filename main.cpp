@@ -89,8 +89,12 @@ int main(int argc, char** argv) {
 
         //-- Get the corners from the image_1 ( the object to be "detected" )
         std::vector<Point2f> obj_corners(4);
-        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint(img_object.cols, 0);
-        obj_corners[2] = cvPoint(img_object.cols, img_object.rows); obj_corners[3] = cvPoint(0, img_object.rows);
+        
+        obj_corners[0] = cvPoint(0,0);
+        obj_corners[1] = cvPoint(img_object.cols, 0);
+        obj_corners[2] = cvPoint(img_object.cols, img_object.rows);
+        obj_corners[3] = cvPoint(0, img_object.rows);
+        
         std::vector<Point2f> scene_corners(4);
 
         perspectiveTransform(obj_corners, scene_corners, H);
@@ -101,7 +105,11 @@ int main(int argc, char** argv) {
         line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
         
+        //-- Draw crosshair in center of drone's view.
         circle(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), 10, Scalar(0, 255, 0));
+        
+        //-- Mark center of recognized image.
+        circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), 20, Scalar(0, 255, 0));
 
         //-- Show detected matches
         imshow("Good Matches & Object detection", img_matches);
