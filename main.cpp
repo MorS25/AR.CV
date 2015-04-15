@@ -119,9 +119,13 @@ int main(int argc, char** argv) {
         //-- Draw crosshair in center of drone's view.
         circle(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), 10, Scalar(0, 255, 0));
         
-        //-- Mark center of recognized image.
+        //-- Mark center of recognized image only if it's actually detected:
         if (scene_corners[1].x - scene_corners[0].x > 10) {
-            circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), 20, Scalar(0, 255, 0)); }
+            // Mark center:
+            circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), 20, Scalar(0, 255, 0));
+        
+            // Draw line from center mark to crosshair:
+            line(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), Scalar(0, 255, 0));}
 
         //-- Show detected matches
         imshow("Good Matches & Object detection", img_matches);
