@@ -17,6 +17,13 @@ void detectKeypoints(Mat& objectImage, Mat& sceneImage, int minHessian, vector<K
     detector.detect(sceneImage, sceneKeyPoints);
 }
 
+void calcDescriptors(Mat& objectImage, Mat& sceneImage, Mat& objectDesc, Mat& sceneDesc, vector<KeyPoint>& objectKeyPoints, vector<KeyPoint>& sceneKeyPoints) {
+    SurfFeatureDetector extractor;
+    
+    extractor.compute(objectImage, objectKeyPoints, objectDesc);
+    extractor.compute(sceneImage, sceneKeyPoints, sceneDesc);
+}
+
 /** @function main */
 int main(int argc, char** argv) {
     Mat img_object = imread("object.jpg", CV_LOAD_IMAGE_GRAYSCALE);
@@ -38,17 +45,15 @@ int main(int argc, char** argv) {
             cout << " --(!) Error reading images " << endl;
             return -1; }
 
+        // Detect key points:
         vector<KeyPoint> keypoints_object, keypoints_scene;
         
         detectKeypoints(img_object, img_scene, 250, keypoints_object, keypoints_scene);
 
-        //-- Step 2: Calculate descriptors (feature vectors)
-        SurfDescriptorExtractor extractor;
-
+        // Calculate descriptors:
         Mat descriptors_object, descriptors_scene;
 
-        extractor.compute(img_object, keypoints_object, descriptors_object);
-        extractor.compute(img_scene, keypoints_scene, descriptors_scene);
+        calcDescriptors(img_object, img_scene, descriptors_object, descriptors_scene, keypoints_object, keypoints_scene);
 
         //-- Step 3: Matching descriptor vectors using FLANN matcher
         FlannBasedMatcher matcher;
