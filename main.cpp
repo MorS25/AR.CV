@@ -14,21 +14,23 @@ void detectKeypoints(Mat& objectImage, Mat& sceneImage, int minHessian, vector<K
     SurfFeatureDetector detector(minHessian);
     
     detector.detect(objectImage, objectKeyPoints);
-    detector.detect(sceneImage, sceneKeyPoints);
-}
+    detector.detect(sceneImage, sceneKeyPoints); }
 
 void calcDescriptors(Mat& objectImage, Mat& sceneImage, Mat& objectDesc, Mat& sceneDesc, vector<KeyPoint>& objectKeyPoints, vector<KeyPoint>& sceneKeyPoints) {
     SurfFeatureDetector extractor;
     
     extractor.compute(objectImage, objectKeyPoints, objectDesc);
-    extractor.compute(sceneImage, sceneKeyPoints, sceneDesc);
-}
+    extractor.compute(sceneImage, sceneKeyPoints, sceneDesc); }
+
+void matchDescriptors(Mat& objectDesc, Mat& sceneDesc, vector<DMatch>& matches) {
+    FlannBasedMatcher matcher;
+    
+    matcher.match(objectDesc, sceneDesc, matches); }
 
 /** @function main */
 int main(int argc, char** argv) {
     Mat img_object = imread("object.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-    Mat img_scene_rgb;
-    Mat img_scene;
+    Mat img_scene_rgb, img_scene;
     VideoCapture cap(0);
     cap >> img_scene_rgb;
     int sceneHeight = img_scene_rgb.rows;
@@ -55,15 +57,15 @@ int main(int argc, char** argv) {
 
         calcDescriptors(img_object, img_scene, descriptors_object, descriptors_scene, keypoints_object, keypoints_scene);
 
-        //-- Step 3: Matching descriptor vectors using FLANN matcher
-        FlannBasedMatcher matcher;
+        // Match descriptors:
         vector<DMatch> matches;
-        matcher.match(descriptors_object, descriptors_scene, matches);
+        
+        matchDescriptors(descriptors_object, descriptors_scene, matches);
 
+        //-- Quick calculation of max and min distances between keypoints
         double max_dist = 0;
         double min_dist = 100;
 
-        //-- Quick calculation of max and min distances between keypoints
         for (int i = 0; i < descriptors_object.rows; ++i) {
             double dist = matches[i].distance;
             if (dist < min_dist) min_dist = dist;
