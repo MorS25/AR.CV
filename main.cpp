@@ -88,6 +88,17 @@ int main(int argc, char** argv) {
         Mat H = findHomography(obj, scene, CV_RANSAC);
 
         //-- Get the corners from the image_1 ( the object to be "detected" )
+        
+        /*  
+         
+            All following corners are indexed like so:
+   
+            [0]-----[1]
+             |       |
+            [3]-----[2]
+         
+        */
+        
         std::vector<Point2f> obj_corners(4);
         
         obj_corners[0] = cvPoint(0,0);
@@ -109,7 +120,8 @@ int main(int argc, char** argv) {
         circle(img_matches, Point(sceneWidth / 2 + img_object.cols, sceneHeight / 2), 10, Scalar(0, 255, 0));
         
         //-- Mark center of recognized image.
-        circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), 20, Scalar(0, 255, 0));
+        if (scene_corners[1].x - scene_corners[0].x > 10) {
+            circle(img_matches, scene_corners[0] + Point2f(img_object.cols, 0) + Point2f(img_object.cols / 2 + 10, img_object.rows / 2 + 20), 20, Scalar(0, 255, 0)); }
 
         //-- Show detected matches
         imshow("Good Matches & Object detection", img_matches);
