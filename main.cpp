@@ -27,6 +27,14 @@ void matchDescriptors(Mat& objectDesc, Mat& sceneDesc, vector<DMatch>& matches) 
     
     matcher.match(objectDesc, sceneDesc, matches); }
 
+void calcMinDistance(double& minDist, double maxDist, Mat& objectDesc, vector<DMatch> matches) {
+    for (int i = 0; i < objectDesc.rows; ++i) {
+        double dist = matches[i].distance;
+        
+        if (dist < minDist) minDist = dist;
+        
+        if (dist > maxDist) maxDist = dist; } }
+
 /** @function main */
 int main(int argc, char** argv) {
     Mat img_object = imread("object.jpg", CV_LOAD_IMAGE_GRAYSCALE);
@@ -37,10 +45,11 @@ int main(int argc, char** argv) {
     int sceneWidth  = img_scene_rgb.cols;
     
     while (true) {
+        // Capture and convert video stream to gray scale:
         cap >> img_scene_rgb;
         
-        // Convert video stream to grayscale.
         img_scene = img_scene_rgb.clone();
+        
         cvtColor(img_scene_rgb, img_scene, CV_RGB2GRAY);
         
         if (!img_object.data || !img_scene.data) {
@@ -62,17 +71,10 @@ int main(int argc, char** argv) {
         
         matchDescriptors(descriptors_object, descriptors_scene, matches);
 
-        //-- Quick calculation of max and min distances between keypoints
-        double max_dist = 0;
+        // Calculate minimum and maximum distances between keypoints:
         double min_dist = 100;
-
-        for (int i = 0; i < descriptors_object.rows; ++i) {
-            double dist = matches[i].distance;
-            if (dist < min_dist) min_dist = dist;
-            if (dist > max_dist) max_dist = dist; }
-
-        printf("-- Max dist : %f \n", max_dist);
-        printf("-- Min dist : %f \n", min_dist);
+        
+        calcMinDistance(min_dist, 0, descriptors_object, matches);
 
         //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
         vector<DMatch> good_matches;
